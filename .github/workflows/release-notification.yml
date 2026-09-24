@@ -71,24 +71,17 @@ jobs:
 
           DESCRIPTION=$(printf \
             '*%s* has been successfully deployed to production.\n\n%s\n\n<%s|View GitHub release> · <%s|View deployment>' \
-            "$RELEASE_TAG" \
             "$RELEASE_NOTES" \
             "$RELEASE_URL" \
             "$RUN_URL")
 
-          MESSAGE=$(jq -n \
-            --arg title "$TITLE" \
-            --arg description "$DESCRIPTION" \
-            '{
-              version: "1.0",
-              source: "custom",
-              content: {
-                textType: "client-markdown",
-                title: $title,
-                description: $description
-              }
-            }')
-
-          aws sns publish \
-            --topic-arn "$TOPIC_ARN" \
-            --message "$MESSAGE"
+      - name: Send Notification
+        uses: govuk-once/govuk-platform-notifications-gh-action@c66db974e7cba94f50c45b30e9cd880d905910c1
+        with:
+          aws_account_id: 542403648748
+          message_type: release
+          message: $TITLE
+          description: $DESCRIPTION
+          repository: $REPOSITORY
+          tag: $RELEASE_TAG
+          slack_channel: "#govuk-once-udp-release-test"
