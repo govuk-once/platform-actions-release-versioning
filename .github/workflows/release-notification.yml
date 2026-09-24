@@ -90,8 +90,8 @@ jobs:
         with:
           aws_account_id: 542403648748 # ${{ steps.aws-account.outputs.account-id }}
           message_type: release
-          message: $TITLE
-          description: $DESCRIPTION
-          repository: $REPOSITORY
-          tag: $RELEASE_TAG
+          message: ${{ env.TITLE }}
+          description: ${{ env.DESCRIPTION }}
+          repository: ${{ github.repository }}
+          tag: ${{ env.RELEASE_TAG }}
           slack_channel: "#govuk-once-udp-release-test"
