@@ -6,9 +6,10 @@ Application repositories remain responsible for their own quality checks, builds
 
 ## Available workflows
 
-| Workflow                                 | Purpose                                                                                                                 |
-| ---------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
-| `.github/workflows/semantic-release.yml` | Determines whether a release is required, creates the Git tag and GitHub release, and returns explicit release outputs. |
+| Workflow                                      | Purpose                                                                                                                 |
+| --------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| `.github/workflows/semantic-release.yml`      | Determines whether a release is required, creates the Git tag and GitHub release, and returns explicit release outputs. |
+| `.github/workflows/release-notification.yml`  | Sends a Slack notification for major and minor production releases. Patch releases are silently skipped.                |
 
 ## Semantic release
 
@@ -70,6 +71,59 @@ For example:
   ]
 }
 ```
+
+## Release notification
+
+Sends a Slack notification when a major or minor release is deployed to production. Patch releases are silently skipped.
+
+The notification includes the release notes, a link to the GitHub release and a link to the deployment run.
+
+### Usage
+
+Chain it after the semantic release job:
+
+```yaml
+jobs:
+  release:
+    name: Create Release
+    uses: govuk-once/github-actions-workflows/.github/workflows/semantic-release.yml@v1
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+
+  notify:
+    name: Notify
+    needs: release
+    if: needs.release.outputs.released == 'true'
+    uses: govuk-once/github-actions-workflows/.github/workflows/release-notification.yml@v1
+    permissions:
+      contents: read
+      id-token: write
+    with:
+      application: my-service
+      version: ${{ needs.release.outputs.version }}
+      type: ${{ needs.release.outputs.type }}
+      slack-channel: "#my-release-channel"
+    secrets:
+      deployment-role: ${{ secrets.AWS_DEPLOYMENT_ROLE }}
+```
+
+### Inputs
+
+| Input           | Required | Default     | Description                          |
+| --------------- | -------- | ----------- | ------------------------------------ |
+| `application`   | Yes      | —           | Human-readable name of the service.  |
+| `version`       | Yes      | —           | Semantic version without `v` prefix. |
+| `type`          | Yes      | —           | `major`, `minor` or `patch`.         |
+| `slack-channel` | Yes      | —           | Slack channel to post to (e.g. `#my-release-channel`). |
+| `aws-region`    | No       | `eu-west-2` | AWS region for credential exchange.  |
+
+### Secrets
+
+| Secret            | Required | Description                                      |
+| ----------------- | -------- | ------------------------------------------------ |
+| `deployment-role` | Yes      | IAM role ARN assumed via OIDC to send the notification. |
 
 ## Repository access
 
