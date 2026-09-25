@@ -12,6 +12,9 @@ on:
       type:
         required: true
         type: string
+      slack-channel:
+        required: true
+        type: string
       aws-region:
         required: false
         type: string
@@ -88,10 +91,10 @@ jobs:
       - name: Send Notification
         uses: govuk-once/govuk-platform-notifications-gh-action@c66db974e7cba94f50c45b30e9cd880d905910c1
         with:
-          aws_account_id: 542403648748 # ${{ steps.aws-account.outputs.account-id }}
+          aws_account_id: ${{ steps.aws-account.outputs.account-id }}
           message_type: release
           message: ${{ env.TITLE }}
           description: ${{ env.DESCRIPTION }}
           repository: ${{ github.repository }}
           tag: ${{ env.RELEASE_TAG }}
-          slack_channel: "#govuk-once-udp-release-test"
+          slack_channel: ${{ inputs.slack-channel }}
