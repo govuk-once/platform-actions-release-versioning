@@ -89,7 +89,7 @@ jobs:
           } >> "$GITHUB_ENV"
 
       - name: Send Notification
-        uses: govuk-once/govuk-platform-notifications-gh-action@c66db974e7cba94f50c45b30e9cd880d905910c1
+        uses: govuk-once/govuk-platform-notifications-gh-action@4807ffbe31b48e3ecc3e8ea66f058068f453fa3a
         with:
           aws_account_id: ${{ steps.aws-account.outputs.account-id }}
           message_type: release
