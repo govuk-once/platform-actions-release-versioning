@@ -93,8 +93,8 @@ jobs:
         with:
           aws_account_id: ${{ steps.aws-account.outputs.account-id }}
           message_type: release
-          message: ${{ env.TITLE }}
-          description: ${{ env.DESCRIPTION }}
+          title: ${{ env.TITLE }}
+          message: ${{ env.DESCRIPTION }}
           repository: ${{ github.repository }}
           tag: ${{ env.RELEASE_TAG }}
           slack_channel: ${{ inputs.slack-channel }}
