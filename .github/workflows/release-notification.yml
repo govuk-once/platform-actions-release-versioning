@@ -82,10 +82,12 @@ jobs:
           echo "RELEASE_TAG=$RELEASE_TAG" >> "$GITHUB_ENV"
           echo "TITLE=$TITLE" >> "$GITHUB_ENV"
 
+          delimiter="NOTIFICATION_$(openssl rand -hex 16)"
+
           {
-          echo "DESCRIPTION<<EOF"
-          echo "$DESCRIPTION"
-          echo "EOF"
+          printf 'DESCRIPTION<<%s\n' "$delimiter"
+          printf '%s\n' "$DESCRIPTION"
+          printf '%s\n' "$delimiter"
           } >> "$GITHUB_ENV"
 
       - name: Send Notification
